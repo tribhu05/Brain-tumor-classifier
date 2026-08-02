@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brain-tumor-classifier"
+version = "1.0.0"
+description = "VGG16 transfer-learning pipeline for 4-class brain MRI tumor classification"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Tribhuwan Singh", email = "your-email@example.com" }
+]
+keywords = [
+    "deep-learning",
+    "computer-vision",
+    "medical-imaging",
+    "tensorflow",
+    "keras",
+    "transfer-learning",
+    "vgg16",
+    "mri-classification",
+    "brain-tumor-detection",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+
+dependencies = [
+    "tensorflow>=2.15,<2.17",
+    "numpy>=1.24,<2.0",
+    "pillow>=10.0",
+    "scikit-learn>=1.3",
+    "matplotlib>=3.7",
+    "seaborn>=0.12",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "black>=23.9",
+    "flake8>=6.1",
+    "isort>=5.12",
+    "mypy>=1.5",
+]
+
+[project.scripts]
+btc-train = "brain_tumor_classifier.training.train:train"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

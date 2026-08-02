@@ -1,0 +1,32 @@
+# Default configuration for the brain tumor classifier.
+# Every value here matches the original prototype notebook's hardcoded
+# hyperparameters, so training behavior is preserved unless you
+# explicitly change a value below.
+#
+# Override any subset of these keys -- omitted keys fall back to the
+# dataclass defaults in src/brain_tumor_classifier/config.py.
+
+data:
+  train_dir: "data/raw/Training"   # expects: <train_dir>/<class_name>/*.jpg
+  test_dir: "data/raw/Testing"     # expects: <test_dir>/<class_name>/*.jpg
+  validation_split: 0.15            # fraction of train_dir held out for validation
+  image_size: 128
+
+model:
+  num_classes: 4
+  dropout_1: 0.3
+  dense_units: 128
+  dropout_2: 0.2
+  trainable_backbone_layers:
+    - "block5_conv3"
+    - "block5_conv2"
+    - "block5_conv1"
+
+training:
+  batch_size: 20
+  epochs: 10
+  learning_rate: 0.0001
+  seed: 42
+  checkpoint_dir: "artifacts/checkpoints"
+  log_dir: "artifacts/logs"
+  early_stopping_patience: 5
