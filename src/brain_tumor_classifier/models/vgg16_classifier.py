@@ -43,6 +43,7 @@ def build_model(
     dense_units: int = 128,
     dropout_2: float = 0.2,
     trainable_backbone_layers: Sequence[str] = ("block5_conv3", "block5_conv2", "block5_conv1"),
+    weights: str | None = "imagenet",
 ):
     """Build and compile the VGG16-based classifier.
 
@@ -56,6 +57,7 @@ def build_model(
         trainable_backbone_layers: Names of VGG16 backbone layers to
             unfreeze for fine-tuning. All other backbone layers remain
             frozen with ImageNet weights.
+        weights: Pretrained weights to initialize backbone with, or None.
 
     Returns:
         A compiled ``tf.keras.Model`` ready for ``model.fit(...)``.
@@ -64,7 +66,7 @@ def build_model(
         ValueError: If any name in ``trainable_backbone_layers`` does
             not exist in the VGG16 backbone.
     """
-    import tensorflow as tf
+    
     from tensorflow.keras.applications import VGG16
     from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
     from tensorflow.keras.models import Sequential
@@ -73,7 +75,7 @@ def build_model(
     base_model = VGG16(
         input_shape=(image_size, image_size, 3),
         include_top=False,
-        weights="imagenet",
+        weights=weights,
     )
 
     base_layer_names = {layer.name for layer in base_model.layers}

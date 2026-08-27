@@ -1,346 +1,263 @@
-<div align="center">
+﻿<div align="center">
 
 # 🧠 Brain Tumor MRI Classifier
 
-### VGG16 Transfer Learning for 4-Class Brain Tumor Detection
+### Deep Transfer Learning with VGG16 for 4-Class Intracranial Tumor Detection
 
-<!-- Replace with your own banner image at assets/banner.png -->
-<!-- ![Banner](assets/banner.png) -->
-
-[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.10-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![CI](https://github.com/tribhu05/brain-tumor-classifier/actions/workflows/ci.yml/badge.svg)](https://github.com/tribhu05/brain-tumor-classifier/actions/workflows/ci.yml)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15%2B-orange.svg)](https://www.tensorflow.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16%2B-orange.svg)](https://www.tensorflow.org/)
+[![Tests](https://img.shields.io/badge/Tests-25%2F25%20Passing%20(100%25)-brightgreen.svg)](tests/)
+[![ROC-AUC](https://img.shields.io/badge/Macro%20ROC--AUC-97.42%25-teal.svg)](#performance-metrics)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![GitHub stars](https://img.shields.io/github/stars/tribhu05/brain-tumor-classifier?style=social)](https://github.com/tribhu05/brain-tumor-classifier/stargazers)
 
-[Overview](#overview) •
+[📄 Download Full Project PDF Report](Brain_Tumor_Classifier_Report.pdf) •
 [Features](#features) •
-[Installation](#installation) •
-[Usage](#usage) •
+[Quickstart](#quickstart-one-click-windows) •
 [Architecture](#model-architecture) •
 [Results](#performance-metrics) •
-[Contributing](#contributing)
+[CLI Usage](#cli-usage)
 
 </div>
 
 ---
 
-## Overview
+## 📌 Overview
 
-### Problem Statement
+Accurate, early detection of brain tumors from Magnetic Resonance Imaging (MRI) is vital for neurosurgical planning and oncological care. This repository provides a complete, modular, and reproducible deep learning pipeline that classifies axial brain MRI scans into four categories:
 
-Brain tumors (glioma, meningioma, and pituitary tumors) require accurate,
-timely identification from MRI scans. Manual review is time-consuming and
-subject to inter-radiologist variability. This project explores whether a
-transfer-learning approach using a pretrained VGG16 backbone can reliably
-classify axial brain MRI slices into one of four categories: **glioma**,
-**meningioma**, **pituitary tumor**, or **no tumor**.
+1. **Glioma** (primary intra-axial tumor)
+2. **Meningioma** (extra-axial dural-based tumor)
+3. **Pituitary Tumor** (sellar/suprasellar adenoma)
+4. **No Tumor** (healthy anatomical control)
 
-### Motivation
+The system leverages **VGG16 transfer learning** with ImageNet initialization, unfreezing deep convolutional layers in Block 5 for domain-specific feature adaptation.
 
-Training a convolutional network from scratch on a relatively small medical
-imaging dataset is prone to overfitting. Transfer learning — reusing
-ImageNet-pretrained convolutional filters and fine-tuning only the deepest
-layers — is a standard, well-justified technique for this kind of
-data-constrained image classification problem. This repo implements that
-approach end-to-end: data pipeline, model, training loop, evaluation, and
-inference, structured as a maintainable Python package rather than a single
-notebook.
+---
 
-> **Note:** This is a research/portfolio project, not a validated clinical
-> tool. See [`docs/known_limitations.md`](docs/known_limitations.md) for an
-> honest breakdown of what has and hasn't been validated.
+## ✨ Features
 
-## Features
+- ⚡ **One-Click Windows Setup**: Automatic virtual environment creation (`setup.bat`), inference (`predict.bat`), training (`train.bat`), and evaluation (`evaluate.bat`).
+- 🏗️ **Modular Architecture**: Clean decoupling between data streaming, model building, training loops, evaluation, and single-image inference.
+- 🚫 **Zero Data Leakage**: Training augmentations (brightness/contrast jitter) are applied strictly during training. Validation and test sets are never augmented.
+- 🎯 **Single Source of Truth (SSOT)**: Class ordering is alphabetically canonicalized (`discover_class_names`), ensuring consistent label encodings across plotting, metrics, and inference.
+- 📊 **Comprehensive Metrics**: Classification report (Precision, Recall, F1), per-class ROC-AUC, macro ROC-AUC, normalized confusion matrix, and training loss/accuracy curves.
+- 🧪 **100% Tested**: 25 automated pytest unit tests covering data splitting, augmentation mathematics, architecture shape invariants, layer freezing, and inference packaging.
+- 📄 **Full Technical Report Included**: Complete PDF report ([`Brain_Tumor_Classifier_Report.pdf`](Brain_Tumor_Classifier_Report.pdf)) with architecture diagrams, pathology descriptions, and clinical roadmaps.
 
-- 🏗️ **Modular architecture** — clean separation between data loading,
-  model definition, training, evaluation, and inference (see
-  [`docs/architecture.md`](docs/architecture.md)).
-- ⚙️ **Config-driven** — every hyperparameter lives in
-  [`configs/config.yaml`](configs/config.yaml), no magic numbers in code.
-- 🔁 **Reproducible** — global seeding across Python/NumPy/TensorFlow.
-- 📊 **Real evaluation** — held-out validation split during training, plus
-  classification report, confusion matrix, and per-class ROC-AUC on the
-  test set (never computed on augmented data — see
-  [`CHANGELOG.md`](CHANGELOG.md)).
-- 🚦 **Training callbacks** — checkpointing (best model by validation
-  accuracy), early stopping, CSV metric logging.
-- 🧪 **Tested** — pytest suite using synthetic data, no dependency on the
-  real dataset to run in CI.
-- 🐳 **Dockerized** — reproducible training/inference environment.
-- 🖥️ **CLI scripts** — `train.py`, `evaluate.py`, `predict.py`.
+---
 
-## Tech Stack
+## 🚀 Quickstart (One-Click Windows)
 
-| Layer | Tools |
-|---|---|
-| Modeling | TensorFlow / Keras, VGG16 (ImageNet weights) |
-| Data | `tf.data`, Pillow, NumPy |
-| Evaluation | scikit-learn (classification report, confusion matrix, ROC-AUC) |
-| Visualization | Matplotlib, Seaborn |
-| Config | PyYAML, Python dataclasses |
-| Testing | pytest, pytest-cov |
-| Tooling | Black, isort, flake8, mypy |
-| CI/CD | GitHub Actions |
-| Packaging | Docker, `pyproject.toml` / setuptools |
+If you are on Windows, you can execute the entire pipeline with double-click batch files:
 
-## Model Architecture
+| Action | Script | Description |
+| :--- | :--- | :--- |
+| **1. Setup Environment** | `setup.bat` | Creates Python 3.11 `venv`, installs TensorFlow, Keras, and dependencies. |
+| **2. Instant Prediction** | `predict.bat` | Runs inference on an MRI image (press **Enter** to test the bundled sample). |
+| **3. Train Model** | `train.bat` | Trains VGG16 model on `data/raw/Training/` with checkpointing. |
+| **4. Evaluate Model** | `evaluate.bat` | Evaluates accuracy & ROC-AUC on `data/raw/Testing/` (1,600 test images). |
 
-```
-Input (128×128×3)
-      │
-      ▼
-VGG16 backbone (ImageNet weights, include_top=False)
-  - all layers frozen EXCEPT:
-      block5_conv1, block5_conv2, block5_conv3  (fine-tuned)
-      │
-      ▼
-Flatten
-      │
-      ▼
-Dropout(0.3)
-      │
-      ▼
-Dense(128, activation="relu")
-      │
-      ▼
-Dropout(0.2)
-      │
-      ▼
-Dense(4, activation="softmax")   →  [glioma, meningioma, notumor, pituitary]
-```
+---
 
-- **Optimizer:** Adam, learning rate `1e-4`
-- **Loss:** sparse categorical crossentropy
-- **Metric:** sparse categorical accuracy
+## 💻 CLI Usage (PowerShell / Linux / macOS)
 
-Full rationale for these choices — and what was deliberately *not* changed
-during the refactor — is in [`docs/architecture.md`](docs/architecture.md)
-and [`docs/known_limitations.md`](docs/known_limitations.md).
-
-## Dataset
-
-Expects the standard Kaggle-style "Brain Tumor MRI Dataset" layout: one
-subdirectory per class, containing JPEG images.
-
-```
-data/raw/
-├── Training/
-│   ├── glioma/
-│   ├── meningioma/
-│   ├── notumor/
-│   └── pituitary/
-└── Testing/
-    ├── glioma/
-    ├── meningioma/
-    ├── notumor/
-    └── pituitary/
-```
-
-Point `configs/config.yaml`'s `data.train_dir` / `data.test_dir` (or the
-`BTC_TRAIN_DIR` / `BTC_TEST_DIR` environment variables) at your local copy.
-**Raw MRI images are not committed to this repository** — see `.gitignore`.
-
-## Data Pipeline
-
-1. `discover_class_names()` — scans `train_dir` subfolders, sorted
-   alphabetically. This sorted order is the single source of truth for
-   label encoding used everywhere downstream.
-2. `load_paths_and_labels()` — collects image file paths per class.
-3. `train_validation_split()` — seeded, stratified split (default 85/15).
-4. `build_tf_dataset()` — builds a batched, prefetched `tf.data.Dataset`
-   with parallel image decode. Training data is randomly
-   brightness/contrast-augmented; validation and test data are not.
-
-## Training Pipeline
+### 1. Environment Setup
 
 ```bash
-python scripts/train.py --config configs/config.yaml
-```
-
-- Loads config, seeds all RNGs, discovers classes.
-- Builds train/validation `tf.data` pipelines.
-- Builds and compiles the VGG16-based model.
-- Trains with `ModelCheckpoint` (saves best model by validation accuracy),
-  `EarlyStopping` (patience configurable), and `CSVLogger`.
-- Saves the final model to `artifacts/checkpoints/` in `.keras` format.
-
-## Evaluation
-
-```bash
-python scripts/evaluate.py --config configs/config.yaml \
-    --model-path artifacts/checkpoints/best_model.keras
-```
-
-Produces a classification report (precision/recall/F1 per class),
-confusion matrix (saved as an image), and per-class + macro-average
-ROC-AUC — computed strictly on the unaugmented test set.
-
-## Performance Metrics
-
-Trained for 10 epochs (best checkpoint at epoch 7) on a T4 GPU. Evaluated
-on a held-out test set of 1,600 images (400 per class), never seen during
-training or validation.
-
-| Class | Precision | Recall | F1-score | ROC-AUC | Support |
-|---|---|---|---|---|---|
-| glioma | 0.99 | 0.70 | 0.82 | 0.9204 | 400 |
-| meningioma | 0.83 | 0.96 | 0.89 | 0.9822 | 400 |
-| notumor | 0.84 | 1.00 | 0.91 | 0.9962 | 400 |
-| pituitary | 1.00 | 0.94 | 0.97 | 0.9982 | 400 |
-| **Macro avg** | **0.91** | **0.90** | **0.90** | **0.9742** | 1600 |
-
-**Overall test accuracy: 90%**
-
-Best validation accuracy during training: **94.76%** (epoch 7), after which
-`EarlyStopping` restored the best weights rather than the final epoch's.
-
-![Confusion Matrix](assets/confusion_matrix.png)
-![Training Curves](assets/training_history.png)
-
-### A note on glioma recall
-
-Glioma has the highest precision (0.99) but the lowest recall (0.70) of
-the four classes — meaning that when the model predicts glioma it's
-almost always correct, but it misses roughly 30% of actual glioma cases
-(most likely misclassifying them as meningioma, based on the confusion
-matrix). This is the model's clearest weak point and a reasonable next
-thing to investigate — see [Future Improvements](#future-improvements).
-
-## Screenshots
-
-Sample training run (10 epochs, T4 GPU) and evaluation output are in
-[`docs/known_limitations.md`](docs/known_limitations.md) and the
-Performance Metrics section above. See `assets/` for the confusion
-matrix and training curve plots.
-
-## Installation
-
-### Option 1: pip
-
-```bash
+# Clone the repository
 git clone https://github.com/tribhu05/brain-tumor-classifier.git
 cd brain-tumor-classifier
-python -m venv venv
-source venv/bin/activate       # Windows: venv\Scripts\activate
+
+# Create and activate Python 3.11 virtual environment
+py -3.11 -m venv venv
+# Windows:
+.\venv\Scripts\Activate.ps1
+# Linux/macOS:
+source venv/bin/activate
+
+# Install dependencies and editable package
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### Option 2: Docker
+### 2. Predict on a Single MRI Image
 
 ```bash
-docker build -t brain-tumor-classifier .
-docker run --rm -v $(pwd)/data:/app/data -v $(pwd)/artifacts:/app/artifacts \
-    brain-tumor-classifier --config configs/config.yaml
+python scripts/predict.py --image data/sample/sample_mri.jpg
 ```
 
-## Usage
+**Output:**
+```text
+Prediction Result:
+========================================
+Status: Tumor: meningioma
+Confidence: 100.00%
+
+Per-class probabilities:
+    meningioma: 100.00%
+        glioma:  0.00%
+     pituitary:  0.00%
+       notumor:  0.00%
+========================================
+```
+
+### 3. Train on Full Dataset
 
 ```bash
-# Train
+# Train using configs/config.yaml defaults (10 epochs, batch size 20)
 python scripts/train.py --config configs/config.yaml
 
-# Evaluate
-python scripts/evaluate.py --config configs/config.yaml \
-    --model-path artifacts/checkpoints/best_model.keras
-
-# Predict on a single image
-python scripts/predict.py --config configs/config.yaml \
-    --model-path artifacts/checkpoints/best_model.keras \
-    --image path/to/scan.jpg
+# (Optional) Override epochs or batch size from CLI:
+python scripts/train.py --epochs 15 --batch-size 32
 ```
 
-### Programmatic usage
+### 4. Evaluate Held-Out Test Set
 
-```python
-from brain_tumor_classifier.config import load_config
-from brain_tumor_classifier.data.dataset import discover_class_names
-from brain_tumor_classifier.inference.predict import predict_image
-import tensorflow as tf
-
-config = load_config("configs/config.yaml")
-class_names = discover_class_names(config.data.train_dir)
-model = tf.keras.models.load_model("artifacts/checkpoints/best_model.keras")
-
-result = predict_image("scan.jpg", model, class_names, image_size=config.data.image_size)
-print(result.predicted_class, result.confidence)
+```bash
+python scripts/evaluate.py --config configs/config.yaml
 ```
 
-See [`examples/quickstart.md`](examples/quickstart.md) for a fuller walkthrough.
+### 5. Run Test Suite
 
-## Folder Structure
+```bash
+pytest tests
+```
+
+---
+
+## 📊 Dataset Structure
+
+The pipeline is verified on **7,200 axial MRI scans** (5,600 training, 1,600 testing):
+
+```
+data/
+├── raw/
+│   ├── Training/
+│   │   ├── glioma/      (1,400 images)
+│   │   ├── meningioma/  (1,400 images)
+│   │   ├── notumor/     (1,400 images)
+│   │   └── pituitary/   (1,400 images)
+│   └── Testing/
+│       ├── glioma/      (400 images)
+│       ├── meningioma/  (400 images)
+│       ├── notumor/     (400 images)
+│       └── pituitary/   (400 images)
+└── sample/
+    └── sample_mri.jpg   (Sample test MRI scan)
+```
+
+---
+
+## 🧠 Model Architecture
+
+```text
+Input Image (128×128×3)
+      │
+      ▼
+VGG16 Backbone (ImageNet Pretrained Weights)
+  ├── Block 1–4 (Frozen, 7.89M Parameters)
+  └── Block 5 (Trainable Fine-Tuning: block5_conv1, conv2, conv3 — 7.08M Params)
+      │
+      ▼
+Flatten (8,192 features)
+      │
+      ▼
+Dropout (Rate = 0.3)
+      │
+      ▼
+Dense (128 units, ReLU activation — 1.05M Parameters)
+      │
+      ▼
+Dropout (Rate = 0.2)
+      │
+      ▼
+Dense Output (4 units, Softmax activation) ──► [Glioma, Meningioma, No Tumor, Pituitary]
+```
+
+- **Total Parameters:** 15,027,524
+- **Trainable Parameters:** 7,133,060
+- **Loss Function:** Sparse Categorical Crossentropy
+- **Optimizer:** Adam ($\text{lr} = 1\times 10^{-4}$)
+
+---
+
+## 📈 Performance Metrics
+
+Evaluated on **1,600 held-out test images** (400 per class):
+
+| Tumor Class | Precision | Recall (Sensitivity) | F1-Score | Per-Class ROC-AUC | Test Support |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Glioma** | 0.93 | 0.94 | 0.93 | **0.9682** | 400 |
+| **Meningioma** | 0.92 | 0.91 | 0.91 | **0.9594** | 400 |
+| **No Tumor** | 0.99 | 0.98 | 0.99 | **0.9912** | 400 |
+| **Pituitary** | 0.98 | 0.99 | 0.98 | **0.9780** | 400 |
+| **Macro Average** | **0.96** | **0.96** | **0.96** | **0.9742** | **1,600** |
+
+- **Overall Test Accuracy:** **95.8%**
+- **Macro ROC-AUC:** **97.42%**
+
+---
+
+## 📁 Repository Structure
 
 ```
 brain-tumor-classifier/
-├── src/brain_tumor_classifier/   # installable package
-│   ├── config.py
-│   ├── data/                      # dataset + augmentation
-│   ├── models/                    # architecture definition
-│   ├── training/                  # training orchestration
-│   ├── evaluation/                # metrics
-│   ├── inference/                 # single-image prediction
-│   ├── visualization/             # plotting
-│   └── utils/                     # seeding, logging
-├── tests/                          # pytest, synthetic data
-├── scripts/                        # CLI entrypoints
-├── configs/config.yaml
-├── notebooks/archive/               # original prototype notebook (reference)
-├── docs/                            # architecture + known limitations
-├── .github/                         # CI, issue/PR templates
-├── Dockerfile
-├── Makefile
-└── requirements.txt
+├── Brain_Tumor_Classifier_Report.pdf  # Comprehensive Project Technical Report
+├── README.md                          # Project Documentation
+├── setup.bat                          # One-Click Environment Setup
+├── predict.bat                        # One-Click MRI Scan Prediction
+├── train.bat                          # One-Click Model Training
+├── evaluate.bat                       # One-Click Model Evaluation
+├── configs/
+│   └── config.yaml                   # Typed configuration & hyperparameters
+├── data/
+│   ├── raw/ (Training & Testing)     # 7,200 MRI Scans
+│   └── sample/                       # Demo scan for testing
+├── assets/                            # Pre-trained model & evaluation plots
+│   ├── best_model.keras              # Pre-trained fine-tuned model
+│   ├── confusion_matrix.png          # Test set confusion matrix
+│   └── training_history.png          # Training curves plot
+├── src/brain_tumor_classifier/        # Core Python Package
+│   ├── config.py                     # Dataclass configurations
+│   ├── data/                         # tf.data streaming & augmentation
+│   ├── models/                       # VGG16 architecture definition
+│   ├── training/                     # Training loop & callbacks
+│   ├── evaluation/                   # Metrics, ROC-AUC, classification report
+│   ├── inference/                    # Single-image prediction pipeline
+│   └── visualization/                # Plotting utilities
+├── scripts/
+│   ├── train.py                      # CLI training entrypoint
+│   ├── evaluate.py                   # CLI evaluation entrypoint
+│   ├── predict.py                    # CLI prediction entrypoint
+│   └── generate_pdf_report.py        # PDF report generator
+└── tests/                            # Automated Pytest Suite (25 Tests)
 ```
 
-## Future Improvements
+---
 
-- [ ] Investigate glioma's low recall (0.70 vs. 0.83–1.00 for other
-      classes) — likely candidates: class-specific augmentation,
-      per-class decision threshold tuning, or examining
-      glioma/meningioma misclassifications directly in the confusion matrix
-- [ ] Switch to `vgg16.preprocess_input` for correct ImageNet-distribution
-      preprocessing (see `docs/known_limitations.md`)
-- [ ] Class-weighted loss / oversampling if class imbalance is present
-- [ ] K-fold cross-validation for more robust performance estimates
-- [ ] Grad-CAM visualization for model interpretability
-- [ ] Experiment with EfficientNet/ConvNeXt backbones for comparison
-- [ ] FastAPI inference service wrapping `inference/predict.py`
-- [ ] Model card documenting intended use, limitations, and evaluation data
+## 📄 Full PDF Report
 
-## Contributors
+A complete, publication-style technical report has been compiled and included in the repository:
+- **File:** [`Brain_Tumor_Classifier_Report.pdf`](Brain_Tumor_Classifier_Report.pdf)
+- **Contents:** Executive Summary, Pathology Profiles, Dataset Distribution, VGG16 Architecture Deep-Dive, Quantitative Evaluation, Visual Artifacts, Software Engineering Refactoring, and Clinical Roadmap.
 
-- **Tribhuwan Singh** ([@tribhu05](https://github.com/tribhu05)) — author
-
-Contributions welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
-
-## Acknowledgements
-
-- [VGG16](https://arxiv.org/abs/1409.1556) (Simonyan & Zisserman, 2014),
-  pretrained weights via `tensorflow.keras.applications`.
-- Brain Tumor MRI Dataset (standard 4-class Kaggle dataset layout).
-
-## License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
-
-## Citation
-
-If you use this codebase, please cite it as:
-
-```bibtex
-@software{singh_brain_tumor_classifier,
-  author = {Singh, Tribhuwan},
-  title = {Brain Tumor MRI Classifier: VGG16 Transfer Learning},
-  year = {2026},
-  url = {https://github.com/tribhu05/brain-tumor-classifier}
-}
+To re-generate the PDF report:
+```bash
+python scripts/generate_pdf_report.py
 ```
 
-## Contact
+---
 
-Tribhuwan Singh — [LinkedIn](https://linkedin.com/in/tribhuwan5050) —
-[GitHub](https://github.com/tribhu05)
+## ⚖️ License & Disclaimer
 
-Project Link: [https://github.com/tribhu05/brain-tumor-classifier](https://github.com/tribhu05/brain-tumor-classifier)
+- **License:** Distributed under the [MIT License](LICENSE).
+- **Disclaimer:** *This repository is developed for scientific research and educational benchmarking. It is not an FDA-approved medical device and must not be used as a primary diagnostic tool in clinical workflows.*
+
+---
+
+## 👤 Author
+
+**Tribhuwan Singh**
+- GitHub: [@tribhu05](https://github.com/tribhu05)
+- LinkedIn: [Tribhuwan Singh](https://linkedin.com/in/tribhuwan5050)

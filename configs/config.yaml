@@ -11,6 +11,11 @@ data:
   test_dir: "data/raw/Testing"     # expects: <test_dir>/<class_name>/*.jpg
   validation_split: 0.15            # fraction of train_dir held out for validation
   image_size: 128
+  class_names:
+    - "glioma"
+    - "meningioma"
+    - "notumor"
+    - "pituitary"
 
 model:
   num_classes: 4

@@ -42,6 +42,9 @@ class DataConfig:
     # issue #2) -- this is a genuine fix, not just refactoring.
     validation_split: float = 0.15
     image_size: int = 128
+    class_names: List[str] = field(
+        default_factory=lambda: ["glioma", "meningioma", "notumor", "pituitary"]
+    )
 
 
 @dataclass

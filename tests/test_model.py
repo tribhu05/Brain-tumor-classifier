@@ -17,14 +17,14 @@ from brain_tumor_classifier.models.vgg16_classifier import build_model  # noqa: 
 
 
 def test_build_model_output_shape():
-    model = build_model(image_size=32, num_classes=4)
+    model = build_model(image_size=32, num_classes=4, weights=None)
     dummy_input = tf.zeros((1, 32, 32, 3))
     output = model(dummy_input, training=False)
     assert output.shape == (1, 4)
 
 
 def test_build_model_output_is_a_valid_probability_distribution():
-    model = build_model(image_size=32, num_classes=4)
+    model = build_model(image_size=32, num_classes=4, weights=None)
     dummy_input = tf.random.uniform((2, 32, 32, 3))
     output = model(dummy_input, training=False).numpy()
 
@@ -35,7 +35,9 @@ def test_build_model_output_is_a_valid_probability_distribution():
 
 def test_build_model_unfreezes_only_requested_layers():
     trainable_layers = ("block5_conv3", "block5_conv2")
-    model = build_model(image_size=32, num_classes=4, trainable_backbone_layers=trainable_layers)
+    model = build_model(
+        image_size=32, num_classes=4, trainable_backbone_layers=trainable_layers, weights=None
+    )
 
     base_model = model.layers[0]
     for layer in base_model.layers:
@@ -47,4 +49,6 @@ def test_build_model_unfreezes_only_requested_layers():
 
 def test_build_model_invalid_layer_name_raises():
     with pytest.raises(ValueError):
-        build_model(image_size=32, num_classes=4, trainable_backbone_layers=("not_a_real_layer",))
+        build_model(
+            image_size=32, num_classes=4, trainable_backbone_layers=("not_a_real_layer",), weights=None
+        )

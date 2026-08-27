@@ -31,7 +31,12 @@ logger = logging.getLogger(__name__)
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate a trained brain tumor classifier.")
     parser.add_argument("--config", type=str, default="configs/config.yaml")
-    parser.add_argument("--model-path", type=str, required=True, help="Path to a saved .keras model.")
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default="artifacts/checkpoints/best_model.keras",
+        help="Path to a saved .keras model (defaults to artifacts/checkpoints/best_model.keras or assets/best_model.keras).",
+    )
     parser.add_argument(
         "--save-confusion-matrix",
         type=str,
@@ -48,7 +53,41 @@ def main() -> None:
     import tensorflow as tf
 
     config = load_config(args.config)
-    class_names = discover_class_names(config.data.train_dir)
+
+    # Check test dataset directory
+    test_dir = Path(config.data.test_dir)
+    if not test_dir.exists() or not any(p.is_dir() for p in test_dir.iterdir()):
+        print(f"\n[ERROR] Test dataset directory not found or empty at '{config.data.test_dir}'.")
+        print("To evaluate the model, place your test data in data/raw/Testing/ (with subdirectories: glioma, meningioma, notumor, pituitary)")
+        print("or edit configs/config.yaml to point to your testing dataset location.\n")
+        sys.exit(1)
+
+    # Resolve class names
+    train_dir = Path(config.data.train_dir)
+    if train_dir.exists() and any(p.is_dir() for p in train_dir.iterdir()):
+        class_names = discover_class_names(train_dir)
+    elif test_dir.exists() and any(p.is_dir() for p in test_dir.iterdir()):
+        class_names = discover_class_names(test_dir)
+    else:
+        class_names = getattr(config.data, "class_names", ["glioma", "meningioma", "notumor", "pituitary"])
+
+    # Resolve model path with fallbacks
+    model_path = Path(args.model_path)
+    if not model_path.exists():
+        fallback_candidates = [
+            Path("assets/best_model.keras"),
+            Path("brain-tumor-classifier/assets/best_model.keras"),
+            Path("../assets/best_model.keras"),
+        ]
+        for candidate in fallback_candidates:
+            if candidate.exists():
+                logger.info("Model not found at %s. Using bundled model at %s", model_path, candidate)
+                model_path = candidate
+                break
+        else:
+            print(f"\n[ERROR] Model file not found at: {args.model_path}")
+            print("Please provide a valid --model-path or place a model at assets/best_model.keras\n")
+            sys.exit(1)
 
     test_paths, test_labels = load_paths_and_labels(config.data.test_dir, class_names)
     test_dataset = build_tf_dataset(
@@ -61,7 +100,7 @@ def main() -> None:
         shuffle=False,
     )
 
-    model = tf.keras.models.load_model(args.model_path)
+    model = tf.keras.models.load_model(str(model_path))
     result = evaluate_model(model, test_dataset, class_names)
 
     print("\nClassification Report\n" + "=" * 60)

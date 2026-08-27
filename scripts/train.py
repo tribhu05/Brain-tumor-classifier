@@ -50,6 +50,16 @@ def main() -> None:
     if args.batch_size is not None:
         config.training.batch_size = args.batch_size
 
+    # Validate dataset existence
+    train_dir = Path(config.data.train_dir)
+    if not train_dir.exists() or not any(p.is_dir() for p in train_dir.iterdir()):
+        print(f"\n[ERROR] Training dataset not found or empty at: {train_dir.resolve()}")
+        print("To train a new model, please download the Brain Tumor MRI dataset and place it in:")
+        print(f"  {train_dir.resolve()}\\<class_name>\\*.jpg")
+        print("Expected class subfolders: glioma, meningioma, notumor, pituitary")
+        print("Or edit 'configs/config.yaml' to point to your custom dataset location.\n")
+        sys.exit(1)
+
     logger.info("Starting training with config: %s", args.config)
     _model, history, class_names = train(config)
 
