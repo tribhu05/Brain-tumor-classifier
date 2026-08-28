@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 from pathlib import Path
 from reportlab.lib.pagesizes import letter
@@ -136,20 +136,20 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
     story = []
 
     # Title Header Block
-    story.append(Paragraph("Brain Tumor MRI Classifier", title_style))
-    story.append(Paragraph("Deep Transfer Learning Architecture & Comprehensive Clinical Evaluation Report", subtitle_style))
+    story.append(Paragraph("BRAIN TUMOR DETECTION USING VGG16 AND ADAM OPTIMIZER", title_style))
+    story.append(Paragraph("School of Computing Science Engineering & Artificial Intelligence — VIT Bhopal University", subtitle_style))
     
-    # Metadata Badge Bar
+    # Metadata Badge Bar with all Group Members
     meta_data = [
         [
-            Paragraph("<b>Author / Lead:</b> Tribhuwan Singh", table_cell),
-            Paragraph("<b>Architecture:</b> VGG16 Transfer Learning", table_cell),
-            Paragraph("<b>Macro ROC-AUC:</b> <font color=\"#0D9488\"><b>97.42%</b></font>", table_cell)
+            Paragraph("<b>Institution:</b> VIT Bhopal University", table_cell),
+            Paragraph("<b>Project Guide:</b> Dr. Vinesh Kumar (Ass. Prof. Sen. Gr.2)", table_cell),
+            Paragraph("<b>Program Chair:</b> Dr. Siddharth Singh Chouhan", table_cell)
         ],
         [
-            Paragraph("<b>Framework:</b> TensorFlow / Keras 2.16", table_cell),
-            Paragraph("<b>Dataset Size:</b> 7,200 MRI Scans (4 Classes)", table_cell),
-            Paragraph("<b>Date:</b> August 2026", table_cell)
+            Paragraph("<b>Team Members:</b><br/>• Tribhuwan Singh (24BAI10358)<br/>• Priyanka Singh (24BAI10316)<br/>• Divyanshi Shrivastava (24BAI10822)", table_cell),
+            Paragraph("<b>Team Members:</b><br/>• Vipul Kumar Verma (24BAI10619)<br/>• Manish Ranjan Rout (24BAI10633)<br/>• P Roshan (24BAI10682)", table_cell),
+            Paragraph("<b>Architecture:</b> VGG16 + Adam<br/><b>Macro ROC-AUC:</b> <font color=\"#0D9488\"><b>97.42%</b></font><br/><b>Overall Accuracy:</b> <b>95.8%</b>", table_cell)
         ]
     ]
     meta_table = Table(meta_data, colWidths=[170, 170, 164])
