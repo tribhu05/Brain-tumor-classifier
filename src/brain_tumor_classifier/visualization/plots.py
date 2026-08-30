@@ -56,7 +56,9 @@ def plot_sample_images(
     if save_path:
         Path(save_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+        plt.close()
+    else:
+        plt.show()
 
 
 def plot_training_history(history, save_path: Optional[str] = None) -> None:
@@ -93,7 +95,9 @@ def plot_training_history(history, save_path: Optional[str] = None) -> None:
     if save_path:
         Path(save_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+        plt.close(fig)
+    else:
+        plt.show()
 
 
 def plot_confusion_matrix(
@@ -115,7 +119,7 @@ def plot_confusion_matrix(
     """
     import seaborn as sns
 
-    plt.figure(figsize=(8, 6))
+    fig = plt.figure(figsize=(8, 6))
     sns.heatmap(
         confusion_matrix,
         annot=True,
@@ -131,4 +135,6 @@ def plot_confusion_matrix(
     if save_path:
         Path(save_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+        plt.close(fig)
+    else:
+        plt.show()

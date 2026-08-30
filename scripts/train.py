@@ -23,6 +23,8 @@ from brain_tumor_classifier.config import load_config
 from brain_tumor_classifier.training.train import train
 from brain_tumor_classifier.utils.logging_config import configure_logging
 
+from brain_tumor_classifier.visualization.plots import plot_training_history
+
 logger = logging.getLogger(__name__)
 
 
@@ -71,6 +73,13 @@ def main() -> None:
         f"{final_val_acc:.4f}" if final_val_acc is not None else "N/A",
         class_names,
     )
+
+    # Save training curves plot
+    plot_save_path = "artifacts/plots/training_history.png"
+    plot_training_history(history, save_path=plot_save_path)
+    logger.info("Training history plot saved to %s", plot_save_path)
+    if Path("assets").exists():
+        plot_training_history(history, save_path="assets/training_history.png")
 
 
 if __name__ == "__main__":

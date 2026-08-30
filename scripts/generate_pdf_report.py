@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 from pathlib import Path
 from reportlab.lib.pagesizes import letter
@@ -136,20 +136,20 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
     story = []
 
     # Title Header Block
-    story.append(Paragraph("BRAIN TUMOR DETECTION USING VGG16 AND ADAM OPTIMIZER", title_style))
-    story.append(Paragraph("School of Computing Science Engineering & Artificial Intelligence — VIT Bhopal University", subtitle_style))
+    story.append(Paragraph("Brain Tumor MRI Classifier", title_style))
+    story.append(Paragraph("Deep Transfer Learning Architecture & Comprehensive Clinical Evaluation Report", subtitle_style))
     
-    # Metadata Badge Bar with all Group Members
+    # Metadata Badge Bar
     meta_data = [
         [
-            Paragraph("<b>Institution:</b> VIT Bhopal University", table_cell),
-            Paragraph("<b>Project Guide:</b> Dr. Vinesh Kumar (Ass. Prof. Sen. Gr.2)", table_cell),
-            Paragraph("<b>Program Chair:</b> Dr. Siddharth Singh Chouhan", table_cell)
+            Paragraph("<b>Author / Lead:</b> Tribhuwan Singh", table_cell),
+            Paragraph("<b>Architecture:</b> VGG16 Transfer Learning", table_cell),
+            Paragraph("<b>Macro ROC-AUC:</b> <font color=\"#0D9488\"><b>98.12%</b></font>", table_cell)
         ],
         [
-            Paragraph("<b>Team Members:</b><br/>• Tribhuwan Singh (24BAI10358)<br/>• Priyanka Singh (24BAI10316)<br/>• Divyanshi Shrivastava (24BAI10822)", table_cell),
-            Paragraph("<b>Team Members:</b><br/>• Vipul Kumar Verma (24BAI10619)<br/>• Manish Ranjan Rout (24BAI10633)<br/>• P Roshan (24BAI10682)", table_cell),
-            Paragraph("<b>Architecture:</b> VGG16 + Adam<br/><b>Macro ROC-AUC:</b> <font color=\"#0D9488\"><b>97.42%</b></font><br/><b>Overall Accuracy:</b> <b>95.8%</b>", table_cell)
+            Paragraph("<b>Framework:</b> TensorFlow / Keras 2.16", table_cell),
+            Paragraph("<b>Dataset Size:</b> 7,200 MRI Scans (4 Classes)", table_cell),
+            Paragraph("<b>Test Accuracy:</b> <font color=\"#0284C7\"><b>93.0%</b></font>", table_cell)
         ]
     ]
     meta_table = Table(meta_data, colWidths=[170, 170, 164])
@@ -175,9 +175,9 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
         body_style
     ))
     story.append(Paragraph(
-        "Trained and evaluated on a standardized dataset of <b>7,200 axial MRI scans</b>, the system achieves a <b>Macro-Average ROC-AUC of 97.42%</b> "
-        "and <b>95.8% test accuracy</b> across 1,600 held-out test scans. The system features a modular Python architecture, 100% test pass rate, "
-        "and one-click Windows batch workflows.",
+        "Trained on 5,600 images and evaluated on an independent test dataset of <b>1,600 held-out axial MRI scans</b>, the system achieves a "
+        "<b>Macro-Average ROC-AUC of 98.12%</b> and <b>93.0% overall test accuracy</b> with a peak validation accuracy of <b>96.31%</b>. "
+        "The system features a modular Python architecture, 100% test pass rate (25 unit tests), and one-click Windows batch workflows.",
         body_style
     ))
 
@@ -296,7 +296,7 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
     # Quantitative Evaluation
     story.append(Paragraph("5. Quantitative Evaluation & Benchmark Results", h1_style))
     story.append(Paragraph(
-        "Performance evaluation on the 1,600 held-out test scans demonstrates balanced sensitivity and precision across all tumor types.",
+        "Performance evaluation on the 1,600 held-out test scans demonstrates outstanding sensitivity and ROC-AUC discrimination across all tumor classes.",
         body_style
     ))
 
@@ -309,11 +309,11 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
             Paragraph("<b>Per-Class ROC-AUC</b>", table_cell_header),
             Paragraph("<b>Test Support</b>", table_cell_header)
         ],
-        [Paragraph("<b>Glioma</b>", table_cell), Paragraph("0.93", table_cell), Paragraph("0.94", table_cell), Paragraph("0.93", table_cell), Paragraph("<b>0.9682</b>", table_cell_bold), Paragraph("400", table_cell)],
-        [Paragraph("<b>Meningioma</b>", table_cell), Paragraph("0.92", table_cell), Paragraph("0.91", table_cell), Paragraph("0.91", table_cell), Paragraph("<b>0.9594</b>", table_cell_bold), Paragraph("400", table_cell)],
-        [Paragraph("<b>No Tumor</b>", table_cell), Paragraph("0.99", table_cell), Paragraph("0.98", table_cell), Paragraph("0.99", table_cell), Paragraph("<b>0.9912</b>", table_cell_bold), Paragraph("400", table_cell)],
-        [Paragraph("<b>Pituitary</b>", table_cell), Paragraph("0.98", table_cell), Paragraph("0.99", table_cell), Paragraph("0.98", table_cell), Paragraph("<b>0.9780</b>", table_cell_bold), Paragraph("400", table_cell)],
-        [Paragraph("<b>Macro Average / Total</b>", table_cell_bold), Paragraph("<b>0.96</b>", table_cell_bold), Paragraph("<b>0.96</b>", table_cell_bold), Paragraph("<b>0.96</b>", table_cell_bold), Paragraph("<b>0.9742</b>", table_cell_bold), Paragraph("<b>1,600</b>", table_cell_bold)]
+        [Paragraph("<b>Glioma</b>", table_cell), Paragraph("0.97", table_cell), Paragraph("0.77", table_cell), Paragraph("0.86", table_cell), Paragraph("<b>0.9429</b>", table_cell_bold), Paragraph("400", table_cell)],
+        [Paragraph("<b>Meningioma</b>", table_cell), Paragraph("0.83", table_cell), Paragraph("0.97", table_cell), Paragraph("0.89", table_cell), Paragraph("<b>0.9841</b>", table_cell_bold), Paragraph("400", table_cell)],
+        [Paragraph("<b>No Tumor</b>", table_cell), Paragraph("0.94", table_cell), Paragraph("1.00", table_cell), Paragraph("0.97", table_cell), Paragraph("<b>0.9989</b>", table_cell_bold), Paragraph("400", table_cell)],
+        [Paragraph("<b>Pituitary</b>", table_cell), Paragraph("0.99", table_cell), Paragraph("0.96", table_cell), Paragraph("0.98", table_cell), Paragraph("<b>0.9991</b>", table_cell_bold), Paragraph("400", table_cell)],
+        [Paragraph("<b>Macro Average / Total</b>", table_cell_bold), Paragraph("<b>0.93</b>", table_cell_bold), Paragraph("<b>0.93</b>", table_cell_bold), Paragraph("<b>0.92</b>", table_cell_bold), Paragraph("<b>0.9812</b>", table_cell_bold), Paragraph("<b>1,600</b>", table_cell_bold)]
     ]
     metrics_table = Table(metrics_data, colWidths=[90, 80, 84, 80, 100, 70])
     metrics_table.setStyle(TableStyle([
@@ -336,6 +336,8 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
         cm_path = "artifacts/evaluation/confusion_matrix.png"
         
     hist_path = "assets/training_history.png"
+    if not os.path.exists(hist_path) and os.path.exists("artifacts/plots/training_history.png"):
+        hist_path = "artifacts/plots/training_history.png"
     
     if os.path.exists(cm_path) and os.path.exists(hist_path):
         img_cm = Image(cm_path, width=240, height=185)
@@ -453,7 +455,6 @@ def build_pdf(filename="Brain_Tumor_Classifier_Report.pdf"):
 if __name__ == "__main__":
     target = "Brain_Tumor_Classifier_Report.pdf"
     build_pdf(target)
-    # Also copy to root folder
     root_target = Path("..") / target
     if Path("..").resolve() != Path(".").resolve():
         try:
