@@ -22,7 +22,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from brain_tumor_classifier.config import load_config
 from brain_tumor_classifier.training.train import train
 from brain_tumor_classifier.utils.logging_config import configure_logging
-
 from brain_tumor_classifier.visualization.plots import plot_training_history
 
 logger = logging.getLogger(__name__)
@@ -36,9 +35,15 @@ def parse_args() -> argparse.Namespace:
         default="configs/config.yaml",
         help="Path to a YAML config file.",
     )
-    parser.add_argument("--epochs", type=int, default=None, help="Override epoch count from config.")
-    parser.add_argument("--batch-size", type=int, default=None, help="Override batch size from config.")
-    parser.add_argument("--log-file", type=str, default="artifacts/logs/train.log", help="Path to write logs.")
+    parser.add_argument(
+        "--epochs", type=int, default=None, help="Override epoch count from config."
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=None, help="Override batch size from config."
+    )
+    parser.add_argument(
+        "--log-file", type=str, default="artifacts/logs/train.log", help="Path to write logs."
+    )
     return parser.parse_args()
 
 

@@ -66,7 +66,7 @@ def build_model(
         ValueError: If any name in ``trainable_backbone_layers`` does
             not exist in the VGG16 backbone.
     """
-    
+
     from tensorflow.keras.applications import VGG16
     from tensorflow.keras.layers import Dense, Dropout, Flatten, Input
     from tensorflow.keras.models import Sequential

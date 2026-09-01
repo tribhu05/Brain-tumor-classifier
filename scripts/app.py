@@ -1,21 +1,20 @@
-﻿"""
+"""
 Flask Web Application for Brain Tumor MRI Detection and Classification.
 Designed based on the B.Tech CSE (AI & ML) Project Report and Presentation at VIT Bhopal University.
 """
 
 import os
 import sys
-import io
-import base64
 from pathlib import Path
-from flask import Flask, request, render_template_string, jsonify, send_file
+
+from flask import Flask, jsonify, render_template_string, request, send_file
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from brain_tumor_classifier.inference.predict import BrainTumorPredictor
 from brain_tumor_classifier.config import load_config
+from brain_tumor_classifier.inference.predict import BrainTumorPredictor
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
@@ -63,7 +62,7 @@ HTML_TEMPLATE = """
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: 
+            background-image:
                 radial-gradient(at 15% 15%, rgba(157, 78, 221, 0.12) 0px, transparent 55%),
                 radial-gradient(at 85% 20%, rgba(0, 240, 255, 0.1) 0px, transparent 55%);
             background-attachment: fixed;
@@ -545,9 +544,11 @@ HTML_TEMPLATE = """
 </html>
 """
 
+
 @app.route("/")
 def index():
     return render_template_string(HTML_TEMPLATE)
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -560,31 +561,36 @@ def predict():
 
     try:
         image = Image.open(file.stream).convert("RGB")
-        
+
         temp_path = PROJECT_ROOT / "artifacts" / "temp_upload.jpg"
         temp_path.parent.mkdir(parents=True, exist_ok=True)
         image.save(temp_path)
 
         if predictor is not None:
             pred_class, confidence, probs = predictor.predict(str(temp_path))
-            return jsonify({
-                "predicted_class": pred_class,
-                "confidence": float(confidence),
-                "probabilities": {k: float(v) for k, v in probs.items()}
-            })
-        else:
-            return jsonify({
-                "predicted_class": "meningioma",
-                "confidence": 0.985,
-                "probabilities": {
-                    "glioma": 0.01,
-                    "meningioma": 0.985,
-                    "notumor": 0.002,
-                    "pituitary": 0.003
+            return jsonify(
+                {
+                    "predicted_class": pred_class,
+                    "confidence": float(confidence),
+                    "probabilities": {k: float(v) for k, v in probs.items()},
                 }
-            })
+            )
+        else:
+            return jsonify(
+                {
+                    "predicted_class": "meningioma",
+                    "confidence": 0.985,
+                    "probabilities": {
+                        "glioma": 0.01,
+                        "meningioma": 0.985,
+                        "notumor": 0.002,
+                        "pituitary": 0.003,
+                    },
+                }
+            )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/download-report")
 def download_report():
@@ -592,6 +598,7 @@ def download_report():
     if report_path.exists():
         return send_file(report_path, as_attachment=True)
     return "Report not found", 404
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

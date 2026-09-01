@@ -36,7 +36,9 @@ def parse_args() -> argparse.Namespace:
         default="artifacts/checkpoints/best_model.keras",
         help="Path to a saved .keras model (defaults to artifacts/checkpoints/best_model.keras or assets/best_model.keras).",
     )
-    parser.add_argument("--image", type=str, required=True, help="Path to the MRI image to classify.")
+    parser.add_argument(
+        "--image", type=str, required=True, help="Path to the MRI image to classify."
+    )
     return parser.parse_args()
 
 
@@ -53,7 +55,9 @@ def main() -> None:
     if train_dir.exists() and any(p.is_dir() for p in train_dir.iterdir()):
         class_names = discover_class_names(train_dir)
     else:
-        class_names = getattr(config.data, "class_names", ["glioma", "meningioma", "notumor", "pituitary"])
+        class_names = getattr(
+            config.data, "class_names", ["glioma", "meningioma", "notumor", "pituitary"]
+        )
 
     # Resolve model path with fallbacks
     model_path = Path(args.model_path)
@@ -65,12 +69,16 @@ def main() -> None:
         ]
         for candidate in fallback_candidates:
             if candidate.exists():
-                logger.info("Model not found at %s. Using bundled model at %s", model_path, candidate)
+                logger.info(
+                    "Model not found at %s. Using bundled model at %s", model_path, candidate
+                )
                 model_path = candidate
                 break
         else:
             print(f"\n[ERROR] Model file not found at: {args.model_path}")
-            print("Please provide a valid --model-path or place a model at assets/best_model.keras\n")
+            print(
+                "Please provide a valid --model-path or place a model at assets/best_model.keras\n"
+            )
             sys.exit(1)
 
     image_path = Path(args.image)
@@ -83,7 +91,7 @@ def main() -> None:
     result = predict_image(str(image_path), model, class_names, image_size=config.data.image_size)
 
     label = "No Tumor" if not result.is_tumor else f"Tumor: {result.predicted_class}"
-    print(f"\nPrediction Result:\n" + "=" * 40)
+    print("\nPrediction Result:\n" + "=" * 40)
     print(f"Status: {label}")
     print(f"Confidence: {result.confidence * 100:.2f}%")
     print("\nPer-class probabilities:")

@@ -42,13 +42,16 @@ def test_build_model_unfreezes_only_requested_layers():
     base_model = model.layers[0]
     for layer in base_model.layers:
         expected_trainable = layer.name in trainable_layers
-        assert layer.trainable == expected_trainable, (
-            f"Layer '{layer.name}' trainable={layer.trainable}, expected {expected_trainable}"
-        )
+        assert (
+            layer.trainable == expected_trainable
+        ), f"Layer '{layer.name}' trainable={layer.trainable}, expected {expected_trainable}"
 
 
 def test_build_model_invalid_layer_name_raises():
     with pytest.raises(ValueError):
         build_model(
-            image_size=32, num_classes=4, trainable_backbone_layers=("not_a_real_layer",), weights=None
+            image_size=32,
+            num_classes=4,
+            trainable_backbone_layers=("not_a_real_layer",),
+            weights=None,
         )

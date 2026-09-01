@@ -89,9 +89,7 @@ def predict_image(
         predicted_class=predicted_class,
         confidence=confidence,
         is_tumor=predicted_class != no_tumor_label,
-        class_probabilities={
-            name: float(prob) for name, prob in zip(class_names, probabilities)
-        },
+        class_probabilities={name: float(prob) for name, prob in zip(class_names, probabilities)},
     )
     logger.info(
         "Prediction for %s: %s (%.2f%% confidence)",

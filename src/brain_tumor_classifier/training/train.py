@@ -63,9 +63,7 @@ def train(config: Config) -> Tuple[object, object, list]:
         validation_split=config.data.validation_split,
         seed=config.training.seed,
     )
-    logger.info(
-        "Split: %d train / %d validation images", len(train_paths), len(val_paths)
-    )
+    logger.info("Split: %d train / %d validation images", len(train_paths), len(val_paths))
 
     train_dataset = build_tf_dataset(
         train_paths,

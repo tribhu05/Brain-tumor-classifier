@@ -8,7 +8,6 @@ being silently dropped.
 
 from __future__ import annotations
 
-import numpy as np
 import pytest
 
 from brain_tumor_classifier.data.dataset import (
@@ -54,7 +53,7 @@ def test_encode_labels_matches_class_name_index(synthetic_dataset_dir):
 
     # This is the exact bug from the original notebook: encoding must
     # always match discover_class_names' sorted order, everywhere.
-    assert encoded.tolist() == [class_names.index(l) for l in labels]
+    assert encoded.tolist() == [class_names.index(lbl) for lbl in labels]
 
 
 def test_encode_labels_unknown_label_raises():

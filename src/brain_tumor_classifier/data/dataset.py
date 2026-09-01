@@ -105,7 +105,9 @@ def load_paths_and_labels(
                 paths.append(str(image_path))
                 labels.append(class_name)
 
-    logger.info("Loaded %d images across %d classes from %s", len(paths), len(class_names), directory)
+    logger.info(
+        "Loaded %d images across %d classes from %s", len(paths), len(class_names), directory
+    )
     return paths, labels
 
 

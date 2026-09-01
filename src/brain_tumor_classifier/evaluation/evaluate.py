@@ -54,8 +54,8 @@ def evaluate_model(model, dataset, class_names: Sequence[str]) -> EvaluationResu
     Returns:
         An :class:`EvaluationResult` with all computed metrics.
     """
-    from sklearn.metrics import confusion_matrix, classification_report as sk_report
-    from sklearn.metrics import roc_auc_score
+    from sklearn.metrics import classification_report as sk_report
+    from sklearn.metrics import confusion_matrix, roc_auc_score
     from sklearn.preprocessing import label_binarize
 
     y_true: List[int] = []
@@ -70,9 +70,7 @@ def evaluate_model(model, dataset, class_names: Sequence[str]) -> EvaluationResu
     y_pred_probs_arr = np.vstack(y_pred_probs)
     y_pred_labels = np.argmax(y_pred_probs_arr, axis=1)
 
-    report = sk_report(
-        y_true_arr, y_pred_labels, target_names=class_names, zero_division=0
-    )
+    report = sk_report(y_true_arr, y_pred_labels, target_names=class_names, zero_division=0)
     cm = confusion_matrix(y_true_arr, y_pred_labels)
 
     # Per-class ROC-AUC (one-vs-rest), implementing what the original
@@ -87,7 +85,9 @@ def evaluate_model(model, dataset, class_names: Sequence[str]) -> EvaluationResu
                 )
             except ValueError:
                 # Raised if a class is absent from y_true in this batch/split.
-                logger.warning("Could not compute ROC-AUC for class '%s' (class absent from data).", class_name)
+                logger.warning(
+                    "Could not compute ROC-AUC for class '%s' (class absent from data).", class_name
+                )
                 roc_auc_per_class[class_name] = float("nan")
         macro_auc = float(np.nanmean(list(roc_auc_per_class.values())))
     else:

@@ -20,7 +20,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from brain_tumor_classifier.config import load_config
-from brain_tumor_classifier.data.dataset import build_tf_dataset, discover_class_names, load_paths_and_labels
+from brain_tumor_classifier.data.dataset import (
+    build_tf_dataset,
+    discover_class_names,
+    load_paths_and_labels,
+)
 from brain_tumor_classifier.evaluation.evaluate import evaluate_model
 from brain_tumor_classifier.utils.logging_config import configure_logging
 from brain_tumor_classifier.visualization.plots import plot_confusion_matrix
@@ -58,7 +62,9 @@ def main() -> None:
     test_dir = Path(config.data.test_dir)
     if not test_dir.exists() or not any(p.is_dir() for p in test_dir.iterdir()):
         print(f"\n[ERROR] Test dataset directory not found or empty at '{config.data.test_dir}'.")
-        print("To evaluate the model, place your test data in data/raw/Testing/ (with subdirectories: glioma, meningioma, notumor, pituitary)")
+        print(
+            "To evaluate the model, place your test data in data/raw/Testing/ (with subdirectories: glioma, meningioma, notumor, pituitary)"
+        )
         print("or edit configs/config.yaml to point to your testing dataset location.\n")
         sys.exit(1)
 
@@ -69,7 +75,9 @@ def main() -> None:
     elif test_dir.exists() and any(p.is_dir() for p in test_dir.iterdir()):
         class_names = discover_class_names(test_dir)
     else:
-        class_names = getattr(config.data, "class_names", ["glioma", "meningioma", "notumor", "pituitary"])
+        class_names = getattr(
+            config.data, "class_names", ["glioma", "meningioma", "notumor", "pituitary"]
+        )
 
     # Resolve model path with fallbacks
     model_path = Path(args.model_path)
@@ -81,12 +89,16 @@ def main() -> None:
         ]
         for candidate in fallback_candidates:
             if candidate.exists():
-                logger.info("Model not found at %s. Using bundled model at %s", model_path, candidate)
+                logger.info(
+                    "Model not found at %s. Using bundled model at %s", model_path, candidate
+                )
                 model_path = candidate
                 break
         else:
             print(f"\n[ERROR] Model file not found at: {args.model_path}")
-            print("Please provide a valid --model-path or place a model at assets/best_model.keras\n")
+            print(
+                "Please provide a valid --model-path or place a model at assets/best_model.keras\n"
+            )
             sys.exit(1)
 
     test_paths, test_labels = load_paths_and_labels(config.data.test_dir, class_names)
@@ -110,7 +122,9 @@ def main() -> None:
         print(f"  {class_name:>12}: {auc_value:.4f}")
     print(f"\nMacro-average ROC-AUC: {result.macro_auc:.4f}")
 
-    plot_confusion_matrix(result.confusion_matrix, class_names, save_path=args.save_confusion_matrix)
+    plot_confusion_matrix(
+        result.confusion_matrix, class_names, save_path=args.save_confusion_matrix
+    )
     logger.info("Confusion matrix saved to %s", args.save_confusion_matrix)
 
 

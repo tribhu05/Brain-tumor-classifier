@@ -49,7 +49,7 @@ def plot_sample_images(
         ax.imshow(image)
         ax.set_title(labels[idx])
         ax.axis("off")
-    for ax in axes[len(indices):]:
+    for ax in axes[len(indices) :]:
         ax.axis("off")
 
     plt.tight_layout()
