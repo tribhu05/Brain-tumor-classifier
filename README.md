@@ -264,10 +264,3 @@ python scripts/generate_pdf_report.py
 - **License:** Distributed under the [MIT License](LICENSE).
 - **Disclaimer:** *This repository is developed for scientific research and educational benchmarking. It is not an FDA-approved medical device and must not be used as a primary diagnostic tool in clinical workflows.*
 
----
-
-## 👤 Author
-
-**Tribhuwan Singh**
-- GitHub: [@tribhu05](https://github.com/tribhu05)
-- LinkedIn: [Tribhuwan Singh](https://linkedin.com/in/tribhuwan5050)
